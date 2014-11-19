@@ -1,0 +1,4 @@
+name = GSB Restricted Pages
+package = GSB
+core = 7.x
+description = "Provides ability to restrict GSB pages"

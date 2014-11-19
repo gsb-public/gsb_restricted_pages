@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * @file
+ *   Install file for GSB Restricted Pages
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function gsb_restricted_pages_schema() {
+
+  $schema['restricted_pages'] = array(
+    'description' => 'Defines the nodes under restriction - ie. requiring login.',
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The node id.',
+      ),      
+      'access_type' => array(
+        'description' => 'The access type (e.g. alumni, stanford).',
+        'type' => 'varchar',
+        'length' => '40',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('nid', 'access_type'),
+  );
+
+  return $schema;
+}  

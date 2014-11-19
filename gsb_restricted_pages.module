@@ -1,0 +1,79 @@
+<?php
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function gsb_restricted_pages_form_node_form_alter(&$form, &$form_state) {
+
+  $access_type = 'everyone';
+  if (!empty($form_state['node']) && $form_state['node']->nid != null) {
+    $result = db_select('restricted_pages', 'rp')
+        ->fields('rp', array('access_type'))
+        ->condition('nid', $form_state['node']->nid, '=')
+        ->execute()
+        ->fetchField();
+    $access_type = $result ? $result : 'everyone';
+  }
+
+	$form['options']['restricted_pages'] = array( 
+    '#type' => 'select',
+    '#title' => t('Who sees'),
+    '#options' => array( 'everyone' => 'Everyone', 'alumni' => 'Alumni', 'stanford' => 'Stanford' ),
+    '#description' => t('Some description text goes here.'),
+    '#default_value' => $access_type,
+	); 
+
+	$form['actions']['submit']['#submit'][] = 'gsb_restricted_pages_node_submit';
+
+}
+
+/**
+ * Handles submit for the node edit form, to save restricted page information.
+ */
+function gsb_restricted_pages_node_submit($form, &$form_state) {
+  if (empty($form_state['node'])) {
+    return;
+  }
+  $nid = $form_state['node']->nid;
+  $access_type = $form_state['values']['restricted_pages'];
+  $exists = db_query('SELECT 1 FROM {restricted_pages} WHERE nid = :nid', array(':nid' => $nid))->fetchField();
+	if ($access_type != 'everyone') {
+		// write out the restricted page settings
+    $fields = array(
+      'nid' => $nid,
+      'access_type' => $access_type,
+    );
+		if ($exists) {
+		  db_update('restricted_pages')
+		    ->fields($fields)
+		    ->condition('nid', $nid, '=')
+		    ->execute();
+		}
+		else {
+		  db_insert('restricted_pages')
+		    ->fields($fields)
+		    ->execute();	
+		}
+	}
+  else {
+		if ($exists) {
+      db_delete('restricted_pages')
+      ->condition('nid', $nid, '=')
+      ->execute();
+    }
+  }
+}
+
+/**
+ * Implements hook_node_delete
+ * @param $node
+ * @return unknown_type
+ */
+function gsb_restricted_pages_node_delete($node) {
+  $exists = db_query('SELECT 1 FROM {restricted_pages} WHERE nid = :nid', array(':nid' => $node->nid))->fetchField();
+  if ($exists) {
+    db_delete('restricted_pages')
+      ->condition('nid', $node->nid, '=')
+      ->execute();
+  }
+}
