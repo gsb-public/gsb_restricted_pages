@@ -15,13 +15,13 @@ function gsb_restricted_pages_form_node_form_alter(&$form, &$form_state) {
     $access_type = $result ? $result : 'everyone';
   }
 
-	$form['options']['restricted_pages'] = array( 
+	$form['options']['restricted_pages'] = array(
     '#type' => 'select',
     '#title' => t('Who sees'),
     '#options' => array( 'everyone' => 'Everyone', 'alumni' => 'Alumni', 'stanford' => 'Stanford' ),
     '#description' => t('Some description text goes here.'),
     '#default_value' => $access_type,
-	); 
+	);
 
 	$form['actions']['submit']['#submit'][] = 'gsb_restricted_pages_node_submit';
 
@@ -52,7 +52,7 @@ function gsb_restricted_pages_node_submit($form, &$form_state) {
 		else {
 		  db_insert('restricted_pages')
 		    ->fields($fields)
-		    ->execute();	
+		    ->execute();
 		}
 	}
   else {
