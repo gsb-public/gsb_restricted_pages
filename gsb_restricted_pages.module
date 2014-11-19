@@ -8,10 +8,10 @@ function gsb_restricted_pages_form_node_form_alter(&$form, &$form_state) {
   $access_type = 'everyone';
   if (!empty($form_state['node']) && $form_state['node']->nid != null) {
     $result = db_select('restricted_pages', 'rp')
-        ->fields('rp', array('access_type'))
-        ->condition('nid', $form_state['node']->nid, '=')
-        ->execute()
-        ->fetchField();
+      ->fields('rp', array('access_type'))
+      ->condition('nid', $form_state['node']->nid, '=')
+      ->execute()
+      ->fetchField();
     $access_type = $result ? $result : 'everyone';
   }
 
