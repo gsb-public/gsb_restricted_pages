@@ -1,9 +1,26 @@
 <?php
 
 /**
+ * Implements hook_permission().
+ */
+function gsb_restricted_pages_permission() {
+  return array(
+    'restricted pages' => array(
+      'title' => t('Add restricted page settings on a node'),
+      'description' => t('Set restricted page settings on a node.'),
+      'restrict access' => TRUE,
+    )
+  );
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  */
 function gsb_restricted_pages_form_node_form_alter(&$form, &$form_state) {
+
+  if (!user_access('restricted pages')) {
+    return;
+  }
 
   $access_type = 'everyone';
   if (!empty($form_state['node']) && $form_state['node']->nid != null) {
