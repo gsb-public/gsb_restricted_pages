@@ -34,8 +34,8 @@ function gsb_restricted_pages_form_node_form_alter(&$form, &$form_state) {
 
   $form['options']['restricted_pages'] = array(
     '#type' => 'select',
-    '#title' => t('Who sees'),
-    '#options' => array( 'everyone' => 'Everyone', 'alumni' => 'Alumni', 'stanford' => 'Stanford' ),
+    '#title' => t('Who can see'),
+    '#options' => array( 'everyone' => t('Everyone'), 'alumni' => t('Alumni'), 'stanford' => t('Stanford') ),
     '#description' => t('Some description text goes here.'),
     '#default_value' => $access_type,
   );
