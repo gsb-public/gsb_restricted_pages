@@ -51,33 +51,26 @@ function gsb_restricted_pages_node_submit($form, &$form_state) {
   if (empty($form_state['node'])) {
     return;
   }
+  if (empty($form_state['values']['restricted_pages'])) {
+    return;
+  }
   $nid = $form_state['node']->nid;
   $access_type = $form_state['values']['restricted_pages'];
-  $exists = db_query('SELECT 1 FROM {restricted_pages} WHERE nid = :nid', array(':nid' => $nid))->fetchField();
   if ($access_type != 'everyone') {
     // write out the restricted page settings
     $fields = array(
       'nid' => $nid,
       'access_type' => $access_type,
     );
-    if ($exists) {
-      db_update('restricted_pages')
-        ->fields($fields)
-        ->condition('nid', $nid, '=')
-        ->execute();
-    }
-    else {
-      db_insert('restricted_pages')
-        ->fields($fields)
-        ->execute();
-    }
+    db_merge('restricted_pages')
+      ->fields($fields)
+      ->key(array('nid' => $nid))
+      ->execute();
   }
   else {
-    if ($exists) {
-      db_delete('restricted_pages')
-      ->condition('nid', $nid, '=')
-      ->execute();
-    }
+    db_delete('restricted_pages')
+    ->condition('nid', $nid, '=')
+    ->execute();
   }
 }
 
@@ -87,10 +80,7 @@ function gsb_restricted_pages_node_submit($form, &$form_state) {
  * @return unknown_type
  */
 function gsb_restricted_pages_node_delete($node) {
-  $exists = db_query('SELECT 1 FROM {restricted_pages} WHERE nid = :nid', array(':nid' => $node->nid))->fetchField();
-  if ($exists) {
-    db_delete('restricted_pages')
-      ->condition('nid', $node->nid, '=')
-      ->execute();
-  }
+  db_delete('restricted_pages')
+    ->condition('nid', $node->nid, '=')
+    ->execute();
 }
