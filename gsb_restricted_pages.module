@@ -14,6 +14,36 @@ function gsb_restricted_pages_permission() {
 }
 
 /**
+ * Implementation of hook_init
+ * Checks if the page is restricted and if so... then based on the access_type -
+ * calls any module that has a gsb_restricted_pages_info callback.
+ */
+function gsb_restricted_pages_init() {
+
+  $node = menu_get_object();
+
+  if (empty($node)) {
+    return;
+  }
+
+  $access_type = db_select('restricted_pages', 'rp')
+    ->fields('rp', array('access_type'))
+    ->condition('nid', $node->nid, '=')
+    ->execute()
+    ->fetchField();
+
+  if (!$access_type) {
+    return;
+  }
+
+  foreach (module_implements('gsb_restricted_pages_info') as $module) {
+    $info = call_user_func($module . '_gsb_restricted_pages_info');
+    call_user_func($info[$access_type]['callback']);
+  }
+
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  */
 function gsb_restricted_pages_form_node_form_alter(&$form, &$form_state) {
