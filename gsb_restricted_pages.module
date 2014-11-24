@@ -36,11 +36,11 @@ function gsb_restricted_pages_init() {
     return;
   }
 
-  foreach (module_implements('gsb_restricted_pages_info') as $module) {
-    $info = call_user_func($module . '_gsb_restricted_pages_info');
+  $info = module_invoke_all('gsb_restricted_pages_info');
+  if (!empty($info[$access_type]['callback'])) {
     call_user_func($info[$access_type]['callback']);
   }
-
+  
 }
 
 /**
